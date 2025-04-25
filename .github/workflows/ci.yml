@@ -34,6 +34,13 @@ jobs:
           uv venv
           uv sync --dev
 
+      - name: Verify ruff installation
+        run: |
+          echo "--- Checking for ruff executable ---"
+          ls -l .venv/bin/ruff || echo " Ruff executable not found in .venv/bin"
+          echo "--- Checking packages with uv pip list ---"
+          uv pip list | grep ruff || echo " Ruff not found in uv pip list"
+
       - name: Lint with Ruff
         run: uv run ruff check .
 
