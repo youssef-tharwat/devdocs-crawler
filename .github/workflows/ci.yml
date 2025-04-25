@@ -29,12 +29,12 @@ jobs:
           enable-cache: true
           cache-dependency-glob: "uv.lock"
 
-      - name: Create venv, Sync dependencies, and Activate
+      - name: Create venv, Sync dependencies, and Add to PATH
         run: |
           uv venv
           uv sync --dev
-          echo "Activating venv"
-          source .venv/bin/activate
+          echo "Adding .venv/bin to GITHUB_PATH"
+          echo ".venv/bin" >> $GITHUB_PATH
 
       - name: Verify ruff installation
         run: |
