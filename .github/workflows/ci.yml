@@ -29,10 +29,12 @@ jobs:
           enable-cache: true
           cache-dependency-glob: "uv.lock"
 
-      - name: Create venv and Sync dependencies
+      - name: Create venv, Sync dependencies, and Activate
         run: |
           uv venv
           uv sync --dev
+          echo "Activating venv"
+          source .venv/bin/activate
 
       - name: Verify ruff installation
         run: |
@@ -42,7 +44,7 @@ jobs:
           uv pip list | grep ruff || echo " Ruff not found in uv pip list"
 
       - name: Lint with Ruff
-        run: uv run ruff check .
+        run: ruff check .
 
       - name: Check formatting with Ruff
-        run: uv run ruff format --check .
+        run: ruff format --check .
