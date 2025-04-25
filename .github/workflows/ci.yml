@@ -1,0 +1,49 @@
+name: Python CI
+
+on:
+  push:
+    branches:
+      - "main"
+  pull_request:
+    branches:
+      - "main"
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        # Test only on the minimum supported version from pyproject.toml
+        python-version: ["3.12"]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          # Cache uv install and artifacts
+          cache: "uv"
+
+      - name: Install uv
+        run: |
+          curl -LsSf https://astral.sh/uv/install.sh | sh
+          echo "$HOME/.cargo/bin" >> $GITHUB_PATH
+        # Use the official install script for uv
+
+      - name: Create venv and Sync dependencies
+        run: |
+          uv venv
+          uv sync --dev
+        # Removed source as uv run handles the environment
+
+      - name: Lint with Ruff
+        run: uv run ruff check .
+
+      - name: Check formatting with Ruff
+        run: uv run ruff format --check .
+
+      # Removed pytest step
+      # Removed Black step
+      # Removed commented out publish step
