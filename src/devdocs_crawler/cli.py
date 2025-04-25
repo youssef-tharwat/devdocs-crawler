@@ -2,16 +2,11 @@
 
 import asyncio
 import logging
-import os
 import sys
 
 import click
 
-# Import the new crawler class
 from .crawler import DevDocCrawler
-
-# Logger setup will be done in main based on flags
-# logger = logging.getLogger("devdocs_crawler") # Can get logger instance inside main
 
 
 @click.command(context_settings=dict(help_option_names=["-h", "--help"]))
@@ -26,7 +21,6 @@ from .crawler import DevDocCrawler
 )
 @click.option(
     "--depth",
-    # Changed short flag for depth to avoid conflict with --debug
     "-D",
     default=1,
     type=click.IntRange(min=0),
@@ -44,7 +38,10 @@ from .crawler import DevDocCrawler
     "--stream",
     is_flag=True,
     default=True,
-    help="Enable streaming mode to process pages as they arrive. Use --no-stream to disable.",
+    help=(
+        "Enable streaming mode to process pages as they arrive. "
+        "Use --no-stream to disable."
+    ),
     show_default=True,
 )
 @click.option(
@@ -71,14 +68,11 @@ def main(
     Use --debug for maximum verbosity.
 
     Example:
-        devdocs-crawler https://docs.example.com -o ./example_docs -D 2 --no-stream --silent
+        devdocs-crawler https://docs.example.com -o ./example_docs -D 2 \
+        --no-stream --silent
     """
 
-    # Configure logging level based on flags
-    if silent:
-        log_level = logging.WARNING
-    else:  # Default behavior
-        log_level = logging.INFO
+    log_level = logging.WARNING if silent else logging.INFO
 
     logging.basicConfig(
         level=log_level,
@@ -86,11 +80,9 @@ def main(
         force=True,
     )
 
-    # Get logger instance after basicConfig is set
     logger = logging.getLogger("devdocs_crawler")
     logger.info(f"Root logging level set to: {logging.getLevelName(log_level)}")
 
-    # Validate URL format
     if not (start_url.startswith("http://") or start_url.startswith("https://")):
         logger.error(
             f"Invalid start_url: {start_url}. Must start with 'http://' or 'https://'"
@@ -103,13 +95,12 @@ def main(
 
     try:
         crawler = DevDocCrawler(output_dir=output)
-
         asyncio.run(
             crawler.run_crawl(
-                start_url,
-                depth,
-                stream,
-                max_pages,
+                start_url=start_url,
+                depth=depth,
+                stream=stream,
+                max_pages=max_pages,
                 silent=silent,
             )
         )
